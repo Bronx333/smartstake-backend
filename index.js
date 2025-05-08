@@ -16,7 +16,22 @@ const { logEvent } = require("./src/logger");
 const app = express();
 const PORT = 5051;
 
-app.use(cors({ origin: "http://localhost:5173" }));
+const allowedOrigins = [
+  "http://localhost:5173", // dev
+  "https://smartstake-frontend-v3-3.vercel.app", // ✅ production frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 app.use(bodyParser.json());
 
 let cachedTopMatches = [];
