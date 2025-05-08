@@ -1,0 +1,46 @@
+const fs = require("fs");
+const path = require("path");
+
+app.get("/analytics", (req, res) => {
+  const logPath = path.join(__dirname, "analytics.log");
+  fs.readFile(logPath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Failed to read analytics log.");
+    }
+
+    const lines = data
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => {
+        try {
+          const { type, payload, timestamp } = JSON.parse(line);
+          return `<li><b>${type}</b> @ ${timestamp}<br/><code>${JSON.stringify(payload)}</code></li>`;
+        } catch {
+          return `<li style="color:red;">Invalid log entry</li>`;
+        }
+      })
+      .join("");
+
+    const html = `
+      <html>
+        <head>
+          <title>SmartStake Analytics</title>
+          <style>
+            body { font-family: sans-serif; background: #0D1B2A; color: white; padding: 20px; }
+            code { color: #facc15; }
+            li { margin-bottom: 12px; }
+          </style>
+        </head>
+        <body>
+          <h1>📊 SmartStake Analytics Log</h1>
+          <ul>${lines}</ul>
+        </body>
+      </html>
+    `;
+    res.send(html);
+  });
+});
+{"type":"bet_click","payload":{"match":"Maria Sakkari vs Belinda Bencic","suggestion":"Stake on Belinda Bencic to win","odds":1.59,"kickoff":"2025-05-07T12:00:00Z"},"timestamp":"2025-05-07T11:20:29.932Z"}
+{"type":"bet_click","payload":{"match":"Vit Kopriva vs Quentin Halys","suggestion":"Stake on Vit Kopriva to win","odds":1.5,"kickoff":"2025-05-07T11:20:00Z"},"timestamp":"2025-05-07T11:20:33.175Z"}
+{"type":"bet_click","payload":{"match":"Ashlyn Krueger vs Anna Bondár","suggestion":"Stake on Ashlyn Krueger to win","odds":1.7,"kickoff":"2025-05-07T12:00:00Z"},"timestamp":"2025-05-07T11:20:36.541Z"}
+{"type":"bet_click","payload":{"match":"Maria Sakkari vs Belinda Bencic","suggestion":"Stake on Belinda Bencic to win","odds":1.6,"kickoff":"2025-05-07T12:00:00Z"},"timestamp":"2025-05-07T11:46:42.343Z"}
