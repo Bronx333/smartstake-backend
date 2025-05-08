@@ -16,21 +16,9 @@ const { logEvent } = require("./src/logger");
 const app = express();
 const PORT = 5051;
 
-const allowedOrigins = [
-  "http://localhost:5173", // dev
-  "https://smartstake-frontend-v3-3.vercel.app", // ✅ production frontend
-  "https://www.smartstake-frontend-v3-3.vercel.app", // optional: in case www is used
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "*", // ⚠️ Allow all origins temporarily for debugging
   })
 );
 app.use(bodyParser.json());
