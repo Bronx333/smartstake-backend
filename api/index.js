@@ -1,3 +1,4 @@
+require("dotenv").config(); // ✅ Load environment variables
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -74,4 +75,5 @@ app.post("/api/log", (req, res) => {
   res.json({ success: true });
 });
 
+// ✅ Export as handler for Vercel
 module.exports = app;
