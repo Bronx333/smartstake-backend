@@ -17,7 +17,7 @@ const app = express();
 const PORT = 5051;
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://smartstake-frontend-v3-3.vercel.app");
+  res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN || "http://localhost:5173");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Credentials", "true");
@@ -148,5 +148,5 @@ setInterval(refreshTopMatches, 1000 * 60 * 60);
 refreshTopMatches();
 
 app.listen(PORT, () => {
-  console.log(`✅ SmartStake backend running at http://localhost:${PORT}`);
+  console.log(`✅ SmartStake backend running on port ${PORT}`);
 });
