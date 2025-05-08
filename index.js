@@ -19,6 +19,7 @@ const PORT = 5051;
 const allowedOrigins = [
   "http://localhost:5173", // dev
   "https://smartstake-frontend-v3-3.vercel.app", // ✅ production frontend
+  "https://www.smartstake-frontend-v3-3.vercel.app", // optional: in case www is used
 ];
 
 app.use(
