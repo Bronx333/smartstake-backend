@@ -48,11 +48,17 @@ app.get("/api/suggestions", async (req, res) => {
   res.json({ matches: enriched.sort((a, b) => b.aiScore - a.aiScore).slice(0, 5) });
 });
 
-app.post("/api/log", (req, res) => {
+app.post("/api/log", async (req, res) => {
   const { type, payload } = req.body;
   if (!type) return res.status(400).json({ error: "Missing log type" });
-  logEvent(type, payload || {});
-  res.json({ success: true });
+
+  try {
+    await logEvent(type, payload || {});
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Error logging event:", err);
+    res.status(500).json({ error: "Failed to log event" });
+  }
 });
 
 function calculateScore({ newsScore, priceChange, kickoff }) {
