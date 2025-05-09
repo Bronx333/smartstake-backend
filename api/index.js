@@ -1,4 +1,4 @@
-require("dotenv").config(); // ✅ Load environment variables
+// /api/index.js
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -9,33 +9,13 @@ const { logEvent } = require("../src/logger");
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
-});
+app.use(cors({
+  origin: process.env.FRONTEND_ORIGIN || "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Origin", "Accept"],
+}));
+
 app.use(bodyParser.json());
-
-let cachedTopMatches = [];
-
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function calculateScore({ newsScore, priceChange, kickoff }) {
-  const newsWeight = 0.6, priceWeight = 0.3, timeWeight = 0.1;
-  const priceStart = priceChange?.[0] || 0;
-  const priceEnd = priceChange?.[priceChange.length - 1] || 0;
-  const priceChangePercent = priceStart ? ((priceStart - priceEnd) / priceStart) * 100 : 0;
-  const hoursToKickoff = Math.max(0, Math.min(24, (new Date(kickoff) - new Date()) / 3600000));
-  return (
-    Math.min(newsScore / 10, 1) * newsWeight +
-    Math.min(Math.abs(priceChangePercent) / 10, 1) * priceWeight +
-    (1 - hoursToKickoff / 24) * timeWeight
-  );
-}
 
 app.get("/api/suggestions", async (req, res) => {
   const upcoming = await fetchUpcomingMatches();
@@ -62,7 +42,7 @@ app.get("/api/suggestions", async (req, res) => {
       aiScore: aiScore.toFixed(3),
     });
 
-    await wait(1000);
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   res.json({ matches: enriched.sort((a, b) => b.aiScore - a.aiScore).slice(0, 5) });
@@ -75,5 +55,18 @@ app.post("/api/log", (req, res) => {
   res.json({ success: true });
 });
 
-// ✅ Export as handler for Vercel
+function calculateScore({ newsScore, priceChange, kickoff }) {
+  const newsWeight = 0.6, priceWeight = 0.3, timeWeight = 0.1;
+  const priceStart = priceChange?.[0] || 0;
+  const priceEnd = priceChange?.[priceChange.length - 1] || 0;
+  const priceChangePercent = priceStart ? ((priceStart - priceEnd) / priceStart) * 100 : 0;
+  const hoursToKickoff = Math.max(0, Math.min(24, (new Date(kickoff) - new Date()) / 3600000));
+  return (
+    Math.min(newsScore / 10, 1) * newsWeight +
+    Math.min(Math.abs(priceChangePercent) / 10, 1) * priceWeight +
+    (1 - hoursToKickoff / 24) * timeWeight
+  );
+}
+
+// ✅ Export handler for Vercel
 module.exports = app;
