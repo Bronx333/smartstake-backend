@@ -68,5 +68,9 @@ function calculateScore({ newsScore, priceChange, kickoff }) {
   );
 }
 
+// ✅ Add a simple root route for browser
+app.get("/", (req, res) => {
+  res.send("✅ SmartStake Backend is live.");
+});
 // ✅ Export handler for Vercel
 module.exports = app;
