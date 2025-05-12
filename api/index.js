@@ -1,5 +1,6 @@
 // /api/index.js
 const express = require("express");
+const microCors = require("micro-cors");
 const bodyParser = require("body-parser");
 const { fetchUpcomingMatches } = require("../src/oddsFetcher");
 const { getNewsTrendScore } = require("../src/newsAnalyzer");
@@ -8,17 +9,11 @@ const { logEvent } = require("../src/logger");
 
 const app = express();
 
-// ✅ Manual CORS fix to support preflight requests
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN || "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Origin, Accept");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-  next();
+const cors = microCors({
+  allowMethods: ["GET", "POST", "OPTIONS"],
+  origin: process.env.FRONTEND_ORIGIN || "*",
 });
+app.use(cors());
 
 app.use(bodyParser.json());
 
