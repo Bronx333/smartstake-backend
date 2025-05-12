@@ -1,6 +1,5 @@
 // /api/index.js
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
 const { fetchUpcomingMatches } = require("../src/oddsFetcher");
 const { getNewsTrendScore } = require("../src/newsAnalyzer");
@@ -9,11 +8,16 @@ const { logEvent } = require("../src/logger");
 
 const app = express();
 
-app.use(cors({
-  origin: process.env.FRONTEND_ORIGIN || "*",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Origin", "Accept"],
-}));
+// ✅ Manual CORS fix to support preflight requests
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN || "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Origin, Accept");
+  if (req.method === "OPTIONS") {
+    return res.status(204).end(); // Preflight request success
+  }
+  next();
+});
 
 app.use(bodyParser.json());
 
