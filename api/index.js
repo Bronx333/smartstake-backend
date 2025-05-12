@@ -11,10 +11,11 @@ const app = express();
 // ✅ Manual CORS fix to support preflight requests
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN || "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Origin, Accept");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   if (req.method === "OPTIONS") {
-    return res.status(204).end(); // Preflight request success
+    return res.status(204).end();
   }
   next();
 });
