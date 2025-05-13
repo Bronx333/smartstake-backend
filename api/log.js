@@ -6,7 +6,10 @@ module.exports = async (req, res) => {
     "Access-Control-Allow-Origin",
     process.env.FRONTEND_ORIGIN || "https://smartstake-frontend-v3-3.vercel.app"
   );
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,PATCH,DELETE,POST,PUT");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+  );
   res.setHeader(
     "Access-Control-Allow-Headers",
     "X-CSRF-Token, X-Requested-With, Accept, Content-Type, Authorization"
